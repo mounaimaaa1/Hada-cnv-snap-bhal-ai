@@ -667,7 +667,7 @@
         let currentTargetUser = "";
         let alertTimeout = null;
 
-        // Working fallback image URLs so nothing appears black
+        // Dynamic streaming background images mapped per option name
         const optionImages = {
             'Snapchat Snaping': 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=500&auto=format&fit=crop&q=60',
             'Snap Camera': 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60',
@@ -798,8 +798,12 @@
                     
                     typeWriterEffect(nextId, responseText, 10, () => {
                         const fullName = formatFullName(val);
-                        // Using a realistic profile photo generator based on the username string
-                        const avatarUrl = `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60`;
+                        
+                        // Dynamic seed-based images changing per username (API Mock)
+                        const avatarUrl = `https://picsum.photos/seed/${val}_avatar/300/300`;
+                        const gridThumb1 = `https://picsum.photos/seed/${val}_grid1/300/400`;
+                        const gridThumb2 = `https://picsum.photos/seed/${val}_grid2/300/400`;
+                        const gridThumb3 = `https://picsum.photos/seed/${val}_grid3/300/400`;
 
                         const profileCardHtml = `
                             <div class="snap-mockup-card">
@@ -815,7 +819,7 @@
                                     <img src="${avatarUrl}" alt="Avatar" class="mockup-avatar-img">
                                     <div class="mockup-user-meta">
                                         <div class="m-name">${fullName}</div>
-                                        <div class="m-handle">${val}</div>
+                                        <div class="m-handle">@${val}</div>
                                         <div class="m-date">Last updated 7/29/2026</div>
                                     </div>
                                 </div>
@@ -828,9 +832,9 @@
                                     <div class="sort-badge">Recent <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i></div>
                                 </div>
                                 <div class="mockup-grid-posts">
-                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
-                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
-                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('${gridThumb1}');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('${gridThumb2}');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('${gridThumb3}');"><i class="fa-solid fa-play"></i></div>
                                 </div>
                             </div>
                         `;

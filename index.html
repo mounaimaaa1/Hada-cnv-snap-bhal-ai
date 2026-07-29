@@ -235,7 +235,7 @@
         .msg-bubble {
             font-size: 15px;
             line-height: 1.5;
-            max-width: 85%;
+            max-width: 88%;
             color: var(--text-main);
             padding-top: 6px;
         }
@@ -269,46 +269,136 @@
         .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounceDot { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* Profile Found Preview Card Style */
-        .profile-preview-card {
+        /* Exact Snapchat Mockup Card Style Matching Reference */
+        .snap-mockup-card {
+            background: #ffffff;
+            color: #000000;
+            border: 4px solid #FFFC00;
+            border-radius: 28px;
+            padding: 18px;
+            margin-top: 14px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .mockup-top-icons {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+            color: #555;
+            font-weight: 600;
+        }
+        .mockup-icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .mockup-icon-item i {
+            font-size: 16px;
+            color: #222;
+        }
+
+        .mockup-profile-header {
             display: flex;
             align-items: center;
             gap: 14px;
-            background: var(--chat-btn-bg);
-            border: 1px solid var(--border-color);
-            padding: 14px;
-            border-radius: 16px;
-            margin-top: 14px;
-            width: 100%;
+            padding: 14px 0;
         }
-        .profile-thumb {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
+        .mockup-avatar-img {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
             object-fit: cover;
-            border: 1px solid var(--border-color);
+            border: 2px solid #ddd;
+        }
+        .mockup-user-meta .m-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #000;
+        }
+        .mockup-user-meta .m-handle {
+            font-size: 13px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .mockup-user-meta .m-date {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .mockup-tabs {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid #eee;
+            margin-top: 4px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .mockup-tab-item {
+            padding: 8px 0;
+            color: #888;
+            position: relative;
+        }
+        .mockup-tab-item.active {
+            color: #000;
+        }
+        .mockup-tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
             background: #000;
         }
-        .profile-info .p-name {
-            font-weight: 700;
-            font-size: 16px;
-            color: var(--text-main);
+
+        .mockup-sort-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px;
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
         }
-        .profile-info .p-status {
-            font-size: 13px;
-            color: var(--text-muted);
+        .sort-badge {
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #333;
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+
+        .mockup-grid-posts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
             margin-top: 4px;
         }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
+        .mockup-post-thumb {
+            height: 110px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            background-color: #111;
+        }
+        .mockup-post-thumb i {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #fff;
+            font-size: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px;
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-            display: inline-block;
         }
 
         .options-box {
@@ -670,6 +760,14 @@
             }, 3000);
         }
 
+        // Helper to format username into a realistic Full Name (e.g., lora.krov -> Lora Krov)
+        function formatFullName(username) {
+            return username.replace(/[\.\_\-]/g, ' ')
+                           .split(' ')
+                           .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                           .join(' ');
+        }
+
         function submitUserIdentifier() {
             const val = userInputField.value.trim();
             
@@ -705,13 +803,40 @@
                     const responseText = `Target profile linked successfully: @${val}. Select the secure data layer you want to extract from this user dashboard:`;
                     
                     typeWriterEffect(nextId, responseText, 10, () => {
-                        // Profile Found Preview Card with Dynamic UI-Avatar based on entered username
+                        const fullName = formatFullName(val);
+                        const avatarUrl = `https://ui-avatars.com/api/?name=${val.replace(/\./g, ' ')}&background=222&color=fff&bold=true`;
+
+                        // Exact Snap Mockup Profile Card with Top Nav, Avatar, Tabs & Grid posts
                         const profileCardHtml = `
-                            <div class="profile-preview-card">
-                                <img src="https://ui-avatars.com/api/?name=${val}&background=FFFC00&color=000&bold=true" alt="Target Profile" class="profile-thumb">
-                                <div class="profile-info">
-                                    <div class="p-name">@${val}</div>
-                                    <div class="p-status"><span class="status-dot"></span> Target found</div>
+                            <div class="snap-mockup-card">
+                                <div class="mockup-top-icons">
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-book-open"></i> Stories</div>
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-play"></i> Spotlight</div>
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-comment"></i> Chat</div>
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-camera"></i> Lenses</div>
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-bolt"></i> Snapchat+</div>
+                                    <div class="mockup-icon-item"><i class="fa-solid fa-download"></i> Download</div>
+                                </div>
+                                <div class="mockup-profile-header">
+                                    <img src="${avatarUrl}" alt="Avatar" class="mockup-avatar-img">
+                                    <div class="mockup-user-meta">
+                                        <div class="m-name">${fullName}</div>
+                                        <div class="m-handle">${val}</div>
+                                        <div class="m-date">Last updated 7/29/2026</div>
+                                    </div>
+                                </div>
+                                <div class="mockup-tabs">
+                                    <div class="mockup-tab-item active">All</div>
+                                    <div class="mockup-tab-item">Spotlight</div>
+                                </div>
+                                <div class="mockup-sort-row">
+                                    <span>Sort by:</span>
+                                    <div class="sort-badge">Recent <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i></div>
+                                </div>
+                                <div class="mockup-grid-posts">
+                                    <div class="mockup-post-thumb" style="background-image: url('eyes.jpg');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('chat.jpg');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('Camera.jpg');"><i class="fa-solid fa-play"></i></div>
                                 </div>
                             </div>
                         `;

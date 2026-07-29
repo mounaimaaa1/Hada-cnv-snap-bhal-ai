@@ -75,15 +75,6 @@
             transition: background-color 0.3s;
         }
 
-        .chat-container::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            opacity: 0.3;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%2327272a' fill-opacity='0.12'%3E%3Cpath d='M10 15h2v2h-2zm10 0h2v2h-2zm-10 10h2v2h-2zm10 0h2v2h-2zm30-10h2v2h-2zm10 0h2v2h-2zm-10 10h2v2h-2zm10 0h2v2h-2zM15 45h2v2h-2zm10 0h2v2h-2zm-10 10h2v2h-2zm10 0h2v2h-2zm30-10h2v2h-2zm10 0h2v2h-2zm-10 10h2v2h-2zm10 0h2v2h-2z'/%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
-        }
-
         .chat-header {
             padding: 16px;
             display: flex;
@@ -224,6 +215,9 @@
             align-items: center;
             justify-content: center;
             background: var(--snap-yellow);
+            color: #000;
+            font-weight: 800;
+            font-size: 14px;
         }
 
         .bot-avatar img {
@@ -269,7 +263,7 @@
         .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounceDot { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* Exact Snapchat Mockup Card Style Matching Reference */
+        /* Snapchat Mockup Card Style */
         .snap-mockup-card {
             background: #ffffff;
             color: #000000;
@@ -388,7 +382,7 @@
             background-size: cover;
             background-position: center;
             position: relative;
-            background-color: #111;
+            background-color: #222;
         }
         .mockup-post-thumb i {
             position: absolute;
@@ -468,7 +462,7 @@
         .media-frame { 
             position: relative; 
             height: 180px; 
-            background: #000; 
+            background: #111; 
             background-size: cover;
             background-position: center;
         }
@@ -639,12 +633,12 @@
 
         <div class="chat-history" id="chatWindow">
             <div class="chat-row ai-row" id="welcomeMsg">
-                <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                <div class="bot-avatar">ST</div>
                 <div class="msg-bubble" id="welcomeText"></div>
             </div>
 
             <div class="chat-row ai-row hidden-row" id="typingBubble">
-                <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                <div class="bot-avatar">ST</div>
                 <div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
             </div>
         </div>
@@ -673,14 +667,15 @@
         let currentTargetUser = "";
         let alertTimeout = null;
 
+        // Working fallback image URLs so nothing appears black
         const optionImages = {
-            'Snapchat Snaping': 'Snaping.jpg',
-            'Snap Camera': 'Camera.jpg',
-            'View Friends List': 'friends.jpg',
-            'Private Folders': 'eyes.jpg',
-            'Chat History': 'chat.jpg',
-            'Live Location Map': 'location.jpg',
-            'Recent Activity': 'typing.jpg'
+            'Snapchat Snaping': 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=500&auto=format&fit=crop&q=60',
+            'Snap Camera': 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60',
+            'View Friends List': 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&auto=format&fit=crop&q=60',
+            'Private Folders': 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60',
+            'Chat History': 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&auto=format&fit=crop&q=60',
+            'Live Location Map': 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=500&auto=format&fit=crop&q=60',
+            'Recent Activity': 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60'
         };
 
         document.body.setAttribute('data-theme', 'dark');
@@ -760,7 +755,6 @@
             }, 3000);
         }
 
-        // Helper to format username into a realistic Full Name (e.g., lora.krov -> Lora Krov)
         function formatFullName(username) {
             return username.replace(/[\.\_\-]/g, ' ')
                            .split(' ')
@@ -795,7 +789,7 @@
                     const row = document.createElement('div');
                     row.className = 'chat-row ai-row';
                     row.innerHTML = `
-                        <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                        <div class="bot-avatar">ST</div>
                         <div class="msg-bubble" id="${nextId}"></div>
                     `;
                     chatWindow.appendChild(row);
@@ -804,9 +798,9 @@
                     
                     typeWriterEffect(nextId, responseText, 10, () => {
                         const fullName = formatFullName(val);
-                        const avatarUrl = `https://ui-avatars.com/api/?name=${val.replace(/\./g, ' ')}&background=222&color=fff&bold=true`;
+                        // Using a realistic profile photo generator based on the username string
+                        const avatarUrl = `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60`;
 
-                        // Exact Snap Mockup Profile Card with Top Nav, Avatar, Tabs & Grid posts
                         const profileCardHtml = `
                             <div class="snap-mockup-card">
                                 <div class="mockup-top-icons">
@@ -834,9 +828,9 @@
                                     <div class="sort-badge">Recent <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i></div>
                                 </div>
                                 <div class="mockup-grid-posts">
-                                    <div class="mockup-post-thumb" style="background-image: url('eyes.jpg');"><i class="fa-solid fa-play"></i></div>
-                                    <div class="mockup-post-thumb" style="background-image: url('chat.jpg');"><i class="fa-solid fa-play"></i></div>
-                                    <div class="mockup-post-thumb" style="background-image: url('Camera.jpg');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
+                                    <div class="mockup-post-thumb" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&auto=format&fit=crop&q=60');"><i class="fa-solid fa-play"></i></div>
                                 </div>
                             </div>
                         `;
@@ -929,7 +923,7 @@
                     const row = document.createElement('div');
                     row.className = 'chat-row ai-row';
                     row.innerHTML = `
-                        <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                        <div class="bot-avatar">ST</div>
                         <div class="msg-bubble" id="${nextId}"></div>
                     `;
                     chatWindow.appendChild(row);
@@ -988,7 +982,7 @@
                             const row = document.createElement('div');
                             row.className = 'chat-row ai-row';
                             row.innerHTML = `
-                                <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                                <div class="bot-avatar">ST</div>
                                 <div class="msg-bubble" id="${finalCardId}"></div>
                             `;
                             chatWindow.appendChild(row);

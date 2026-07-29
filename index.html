@@ -705,10 +705,10 @@
                     const responseText = `Target profile linked successfully: @${val}. Select the secure data layer you want to extract from this user dashboard:`;
                     
                     typeWriterEffect(nextId, responseText, 10, () => {
-                        // Profile Found Preview Card Added Here
+                        // Profile Found Preview Card with Dynamic UI-Avatar based on entered username
                         const profileCardHtml = `
                             <div class="profile-preview-card">
-                                <img src="Snaping.jpg" alt="Target Profile" class="profile-thumb">
+                                <img src="https://ui-avatars.com/api/?name=${val}&background=FFFC00&color=000&bold=true" alt="Target Profile" class="profile-thumb">
                                 <div class="profile-info">
                                     <div class="p-name">@${val}</div>
                                     <div class="p-status"><span class="status-dot"></span> Target found</div>

@@ -155,6 +155,54 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
+        /* Persistent Target Profile Header Bar */
+        .target-profile-bar {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: var(--chat-btn-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 98;
+            animation: fadeInMenu 0.3s ease-out;
+        }
+        .target-profile-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #252525;
+            border: 2px solid var(--snap-yellow);
+            display: grid;
+            place-items: center;
+            flex: none;
+        }
+        .target-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .target-profile-info .username {
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 3px;
+            color: var(--text-main);
+        }
+        .target-profile-info .status {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .target-profile-info .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #20e05f;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #20e05f;
+        }
+
         .snap-dropdown-menu {
             position: absolute;
             top: calc(68px + env(safe-area-inset-top));
@@ -493,6 +541,19 @@
             </div>
         </div>
 
+        <!-- Persistent Profile Bar (Initially Hidden) -->
+        <div class="target-profile-bar" id="targetProfileBar">
+            <div class="target-profile-avatar">
+                <img id="barAvatarImg" src="" alt="Avatar">
+            </div>
+            <div class="target-profile-info">
+                <div class="username" id="barUsernameTxt">@username</div>
+                <div class="status">
+                    <span class="status-dot"></span> Victim found
+                </div>
+            </div>
+        </div>
+
         <div class="snap-dropdown-menu" id="snapMenu">
             <a href="https://snapchat.com/privacy" target="_blank" class="menu-item">
                 <i class="fa-solid fa-user-shield"></i> Privacy Policy
@@ -537,6 +598,9 @@
         const snapMenu = document.getElementById('snapMenu');
         const errorAlert = document.getElementById('errorAlert');
         const alertText = document.getElementById('alertText');
+        const targetProfileBar = document.getElementById('targetProfileBar');
+        const barAvatarImg = document.getElementById('barAvatarImg');
+        const barUsernameTxt = document.getElementById('barUsernameTxt');
 
         let isProcessingStarted = false;
         let currentTargetUser = "";
@@ -673,33 +737,19 @@
                 hideTyping();
                 currentTargetUser = username;
 
+                // Show Persistent Profile Bar at the top
+                barAvatarImg.src = url;
+                barUsernameTxt.innerText = "@" + username;
+                targetProfileBar.style.display = 'flex';
+
                 const nextId = 'ai_' + Date.now();
                 const row = document.createElement('div');
                 row.className = 'chat-row ai-row';
                 row.innerHTML = `
                     <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
-                    <div class="msg-bubble" id="${nextId}"></div>
+                    <div class="msg-bubble" id="${nextId}">Target profile linked successfully. Select the secure data layer you want to extract from this user dashboard:</div>
                 `;
                 chatWindow.appendChild(row);
-                
-                // Render Profile Card inside Chat Bubble
-                const profileCardHtml = `
-                    <div style="margin-bottom: 10px;">Target profile linked successfully:</div>
-                    <div style="display:flex; align-items:center; gap:14px; padding:12px; background:var(--chat-btn-bg); border:1px solid var(--border-color); border-radius:18px;">
-                        <div style="width:56px; height:56px; border-radius:14px; overflow:hidden; background:#252525; border:2px solid var(--snap-yellow); display:grid; place-items:center; flex:none;">
-                            <img src="${url}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
-                        </div>
-                        <div>
-                            <div style="font-weight:800; font-size:16px; margin-bottom:4px; color:var(--text-main);">@${username}</div>
-                            <div style="font-size:13px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
-                                <span style="width:8px; height:8px; background:#20e05f; border-radius:50%; box-shadow:0 0 8px #20e05f;"></span> Victim found
-                            </div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 12px;">Select the secure data layer you want to extract from this user dashboard:</div>
-                `;
-                
-                document.getElementById(nextId).innerHTML = profileCardHtml;
 
                 const optionsHtml = `
                     <div class="options-box">

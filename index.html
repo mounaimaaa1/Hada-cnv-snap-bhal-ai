@@ -1,341 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SnapTools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --snap-yellow: #FFFC00;
-            --snap-black: #000000;
-            --bg-chat: #09090b;
-            --bg-workspace: #020202;
-            --bg-bubble-user: #1c1c1e;
-            --border-color: #27272a;
-            --text-main: #fafafa;
-            --text-muted: #71717a;
-            --font-main: 'Plus Jakarta Sans', sans-serif;
-            --chat-btn-bg: #0c0c0e;
-            --chat-btn-border: #1e1e22;
-            --menu-bg: rgba(9, 9, 11, 0.95);
-            --alert-bg: rgba(20, 20, 25, 0.85);
-            --alert-border: rgba(255, 68, 68, 0.4);
+                    consoleBox.scrollTop = consoleBox.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(logLoop);
+                    callback();
+                }
+            }, 300);
         }
 
-        [data-theme="light"] {
-            --bg-chat: #f4f4f5;
-            --bg-workspace: #e4e4e7;
-            --bg-bubble-user: #e4e4e7;
-            --border-color: #d4d4d8;
-            --text-main: #09090b;
-            --text-muted: #71717a;
-            --chat-btn-bg: #ffffff;
-            --chat-btn-border: #e4e4e7;
-            --menu-bg: rgba(244, 244, 245, 0.95);
-            --alert-bg: rgba(255, 255, 255, 0.9);
-            --alert-border: rgba(255, 68, 68, 0.3);
-        }
+        function animateProgressBarNode(barId, txtId) {
+            let percentage = 0;
+            const fill = document.getElementById(barId);
+            const text = document.getElementById(txtId);
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-main);
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
+            const loop = setInterval(() => {
+                percentage += 2;
+                if(fill) fill.style.width = percentage + '%';
+                if(text) text.innerText = percentage + '%';
 
-        body {
-            background-color: var(--bg-workspace);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            height: 100dvh;
-            overflow: hidden;
-        }
+                if(percentage >= 100) {
+                    clearInterval(loop);
+                    setTimeout(() => {
+                        showTyping();
+                        setTimeout(() => {
+                            hideTyping();
+                            
+                            const finalCardId = 'final_' + Date.now();
+                            const row = document.createElement('div');
+                            row.className = 'chat-row ai-row';
+                            row.innerHTML = `
+                                <div class="bot-avatar"><img src="Logo.JPG" alt="Snapchat Logo"></div>
+                                <div class="msg-bubble" id="${finalCardId}"></div>
+                            `;
+                            chatWindow.appendChild(row);
 
-        .chat-container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--bg-chat);
-            display: flex;
-            flex-direction: column;
-            height: 100dvh;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-chat);
-            z-index: 99;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .menu-bars-btn { background: transparent; border: none; color: var(--text-main); font-size: 20px; cursor: pointer; }
-        .ai-brand { font-weight: 800; font-size: 22px; display: flex; align-items: center; }
-        .ai-brand .part-snap { color: var(--snap-yellow); }
-        .ai-brand .part-tools { color: var(--text-main); }
-
-        /* Persistent Target Profile Header Bar */
-        .target-profile-bar {
-            display: none;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            background: var(--chat-btn-bg);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 98;
-        }
-        .target-profile-avatar {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #252525;
-            border: 2px solid var(--snap-yellow);
-            display: grid;
-            place-items: center;
-            flex: none;
-        }
-        .target-profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .target-profile-info .username { font-weight: 800; font-size: 15px; margin-bottom: 3px; color: var(--text-main); }
-        .target-profile-info .status { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-        .target-profile-info .status-dot { width: 7px; height: 7px; background: #20e05f; border-radius: 50%; box-shadow: 0 0 6px #20e05f; }
-
-        .chat-history {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-
-        .chat-row { display: flex; gap: 14px; max-width: 100%; }
-        .chat-row.user-row { flex-direction: row-reverse; }
-
-        .bot-avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--snap-yellow);
-        }
-        .bot-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-        .msg-bubble { font-size: 15px; line-height: 1.5; max-width: 85%; color: var(--text-main); padding-top: 6px; }
-        .user-row .msg-bubble { background: var(--bg-bubble-user); padding: 12px 18px; border-radius: 18px; max-width: 75%; font-weight: 500; }
-
-        .options-box { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; }
-        .chat-opt-btn {
-            background: var(--chat-btn-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 18px 16px;
-            border-radius: 18px;
-            text-align: left;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        .btn-left-content { display: flex; align-items: center; gap: 16px; }
-        .chat-opt-btn i.btn-icon { color: #FFFC00; }
-
-        .offer-verification-card {
-            border: 1px dashed var(--text-muted);
-            background: transparent;
-            border-radius: 20px;
-            padding: 32px 20px;
-            margin-top: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 16px;
-            width: 100%;
-        }
-        .verification-icon { color: var(--snap-black); background: var(--snap-yellow); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        
-        .gpt-action-btn {
-            display: inline-block;
-            background: #FFFC00;
-            color: #000;
-            padding: 14px 28px;
-            border-radius: 30px;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 15px;
-            margin-top: 8px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .chat-input-area { padding: 12px 16px calc(24px + env(safe-area-inset-bottom)) 16px; background: var(--bg-chat); }
-        .input-box-container {
-            background: var(--chat-btn-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            padding: 6px 8px 6px 20px;
-        }
-        .gpt-input { background: transparent; border: none; outline: none; color: var(--text-main); font-size: 15px; flex-grow: 1; padding: 10px 0; }
-        .send-btn {
-            width: 40px; height: 40px;
-            background: var(--text-main);
-            color: var(--bg-chat);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .hidden-row { display: none !important; }
-    </style>
-</head>
-<body>
-
-    <div class="chat-container">
-        <div class="chat-header">
-            <div class="header-left">
-                <button class="menu-bars-btn"><i class="fa-solid fa-bars"></i></button>
-                <div class="brand-wrapper">
-                    <span class="ai-brand"><span class="part-snap">Snap</span><span class="part-tools">Tools</span></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Persistent Profile Bar (Initially Hidden) -->
-        <div class="target-profile-bar" id="targetProfileBar">
-            <div class="target-profile-avatar">
-                <img id="barAvatarImg" src="" alt="Avatar">
-            </div>
-            <div class="target-profile-info">
-                <div class="username" id="barUsernameTxt">@username</div>
-                <div class="status">
-                    <span class="status-dot"></span> Victim found
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-history" id="chatWindow">
-            <div class="chat-row ai-row" id="welcomeMsg">
-                <div class="bot-avatar"><img src="Logo.JPG" alt="Logo"></div>
-                <div class="msg-bubble" id="welcomeText">Welcome to SnapTools Pro. Enter target username below:</div>
-            </div>
-
-            <div class="chat-row ai-row hidden-row" id="typingBubble">
-                <div class="bot-avatar"><img src="Logo.JPG" alt="Logo"></div>
-                <div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
-            </div>
-        </div>
-
-        <div class="chat-input-area">
-            <div class="input-box-container">
-                <input type="text" class="gpt-input" id="userInputField" placeholder="Enter target Snapchat username..." autocomplete="off">
-                <button class="send-btn" id="sendBtn" onclick="submitUserIdentifier()"><i class="fa-solid fa-arrow-up"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const chatWindow = document.getElementById('chatWindow');
-        const userInputField = document.getElementById('userInputField');
-        const sendBtn = document.getElementById('sendBtn');
-        const targetProfileBar = document.getElementById('targetProfileBar');
-        const barAvatarImg = document.getElementById('barAvatarImg');
-        const barUsernameTxt = document.getElementById('barUsernameTxt');
-
-        let isProcessingStarted = false;
-        let currentTargetUser = "";
-        let currentLangCode = 'en';
-
-        const translations = {
-            en: {
-                verifyTitle: "Continue to Unlock",
-                verifyDesc: "Complete the verification step to access this secure data stream.",
-                verifyBtn: "Verify & Access"
-            }
-        };
-
-        function cleanUsername(value){
-            return value.trim().replace(/^@+/, "").replace(/[^a-zA-Z0-9._-]/g, "");
-        }
-
-        function avatarUrl(username){
-            return `https://us-east1-aws.api.snapchat.com/web-capture/www.snapchat.com/@${encodeURIComponent(username)}/preview/square.jpeg?xp_id=1`;
-        }
-
-        function loadImage(url){
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(url);
-                img.onerror = () => reject(new Error("Image failed"));
-                img.src = url + "&t=" + Date.now();
-            });
-        }
-
-        async function submitUserIdentifier() {
-            const rawVal = userInputField.value.trim();
-            const username = cleanUsername(rawVal);
-            
-            if (!username) return;
-            if (isProcessingStarted) return; 
-            isProcessingStarted = true;
-
-            userInputField.value = '';
-            userInputField.disabled = true;
-            sendBtn.disabled = true;
-
-            try {
-                const url = avatarUrl(username);
-                await loadImage(url);
-
-                currentTargetUser = username;
-
-                // Show Persistent Profile Bar at the top
-                barAvatarImg.src = url;
-                barUsernameTxt.innerText = "@" + username;
-                targetProfileBar.style.display = 'flex';
-
-                const nextId = 'ai_' + Date.now();
-                const row = document.createElement('div');
-                row.className = 'chat-row ai-row';
-                row.innerHTML = `<div class="bot-avatar"><img src="Logo.JPG" alt="Logo"></div><div class="msg-bubble" id="${nextId}">Target profile linked successfully. Select the secure data layer:</div>`;
-                chatWindow.appendChild(row);
-
-                const optionsHtml = `
-                    <div class="options-box">
-                        <button class="chat-opt-btn" onclick="redirectToOgadsLocker()">
-                            <div class="btn-left-content"><i class="fa-solid fa-bolt btn-icon"></i><span>Snapchat Snaping</span></div><i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                    </div>
-                `;
-                document.getElementById(nextId).innerHTML += optionsHtml;
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-
-            } catch(e) {
-                isProcessingStarted = false;
-                userInputField.disabled = false;
-                sendBtn.disabled = false;
-                alert(`Could not load a public preview for "@${username}".`);
-            }
+                            const dict = translations[currentLangCode];
+                            const finalOfferHtml = `
+                                <div class="offer-verification-card">
+                                    <div class="verification-icon"><i class="fa-solid fa-user-shield"></i></div>
+                                    <h4>${dict.verifyTitle}</h4>
+                                    <p>${dict.verifyDesc}</p>
+                                    <button class="gpt-action-btn" onclick="redirectToOgadsLocker()">
+                                        <i class="fa-solid fa-key"></i> ${dict.verifyBtn}
+                                    </button>
+                                </div>
+                            `;
+                            document.getElementById(finalCardId).innerHTML = finalOfferHtml;
+                            chatWindow.scrollTop = chatWindow.scrollHeight;
+                        }, 1000);
+                    }, 400);
+                }
+            }, 35);
         }
 
         function redirectToOgadsLocker() {

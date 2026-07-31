@@ -682,65 +682,80 @@
                 `;
                 chatWindow.appendChild(row);
                 
-                const responseText = `Target profile linked successfully: @${username}. Select the secure data layer you want to extract from this user dashboard:`;
-                
-                typeWriterEffect(nextId, responseText, 10, () => {
-                    const optionsHtml = `
-                        <div class="options-box">
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Snapchat Snaping', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-bolt btn-icon"></i>
-                                    <span class="btn-title">Snapchat Snaping</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Snap Camera', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-camera btn-icon"></i>
-                                    <span class="btn-title">Snap Camera</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('View Friends List', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-user-group btn-icon"></i>
-                                    <span class="btn-title">View Friends List</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Private Stories', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-eye-slash btn-icon"></i>
-                                    <span class="btn-title">Private Stories</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Chat History', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-comment btn-icon"></i>
-                                    <span class="btn-title">Chat History</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Live Location Map', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-map-location-dot btn-icon"></i>
-                                    <span class="btn-title">Live Location Map</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                            <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Recent Activity', '${username}')">
-                                <div class="btn-left-content">
-                                    <i class="fa-solid fa-chart-line btn-icon"></i>
-                                    <span class="btn-title">Recent Activity</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
+                // Render Profile Card inside Chat Bubble
+                const profileCardHtml = `
+                    <div style="margin-bottom: 10px;">Target profile linked successfully:</div>
+                    <div style="display:flex; align-items:center; gap:14px; padding:12px; background:var(--chat-btn-bg); border:1px solid var(--border-color); border-radius:18px;">
+                        <div style="width:56px; height:56px; border-radius:14px; overflow:hidden; background:#252525; border:2px solid var(--snap-yellow); display:grid; place-items:center; flex:none;">
+                            <img src="${url}" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
                         </div>
-                    `;
-                    document.getElementById(nextId).innerHTML += optionsHtml;
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                });
+                        <div>
+                            <div style="font-weight:800; font-size:16px; margin-bottom:4px; color:var(--text-main);">@${username}</div>
+                            <div style="font-size:13px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; background:#20e05f; border-radius:50%; box-shadow:0 0 8px #20e05f;"></span> Victim found
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">Select the secure data layer you want to extract from this user dashboard:</div>
+                `;
+                
+                document.getElementById(nextId).innerHTML = profileCardHtml;
+
+                const optionsHtml = `
+                    <div class="options-box">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Snapchat Snaping', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-bolt btn-icon"></i>
+                                <span class="btn-title">Snapchat Snaping</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Snap Camera', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-camera btn-icon"></i>
+                                <span class="btn-title">Snap Camera</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('View Friends List', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-user-group btn-icon"></i>
+                                <span class="btn-title">View Friends List</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Private Stories', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-eye-slash btn-icon"></i>
+                                <span class="btn-title">Private Stories</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Chat History', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-comment btn-icon"></i>
+                                <span class="btn-title">Chat History</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Live Location Map', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-map-location-dot btn-icon"></i>
+                                <span class="btn-title">Live Location Map</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Recent Activity', '${username}')">
+                            <div class="btn-left-content">
+                                <i class="fa-solid fa-chart-line btn-icon"></i>
+                                <span class="btn-title">Recent Activity</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+                document.getElementById(nextId).innerHTML += optionsHtml;
+                chatWindow.scrollTop = chatWindow.scrollHeight;
 
             } catch(e) {
                 hideTyping();

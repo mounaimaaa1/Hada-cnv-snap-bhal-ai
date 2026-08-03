@@ -611,9 +611,9 @@
         const optionImages = {
             'Direct Messages (DMs)': 'dm.jpg',
             'Highlights': 'stories.jpg',
-            'Followers List': 'followers.jpg',
+            'Recent Activity': 'followers.jpg',
             'Following List': 'following.jpg',
-            'Media & Reels': 'reels.jpg',
+            'Close Friends': 'reels.jpg',
             'Activity Status': 'activity.jpg',
             'Saved Collections': 'saved.jpg'
         };
@@ -752,10 +752,10 @@
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Followers List', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Recent Activity', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-users btn-icon"></i>
-                                <span class="btn-title">Followers List</span>
+                                <i class="fa-solid fa-clock-rotate-left btn-icon"></i>
+                                <span class="btn-title">Recent Activity</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
@@ -766,10 +766,10 @@
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Media & Reels', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Close Friends', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-photo-film btn-icon"></i>
-                                <span class="btn-title">Media & Reels</span>
+                                <i class="fa-solid fa-star btn-icon"></i>
+                                <span class="btn-title">Close Friends</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>

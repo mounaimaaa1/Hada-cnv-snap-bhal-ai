@@ -157,7 +157,6 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* Persistent Target Profile Header Bar */
         .target-profile-bar {
             display: none;
             align-items: center;
@@ -545,7 +544,6 @@
             </div>
         </div>
 
-        <!-- Persistent Profile Bar (Initially Hidden) -->
         <div class="target-profile-bar" id="targetProfileBar">
             <div class="target-profile-avatar">
                 <img id="barAvatarImg" src="" alt="Avatar">
@@ -697,22 +695,8 @@
             }, 3000);
         }
 
-        // Instagram API / Avatar Helper Functions
         function cleanUsername(value){
             return value.trim().replace(/^@+/, "").replace(/[^a-zA-Z0-9._]/g, "");
-        }
-
-        function avatarUrl(username){
-            return `https://unavatar.io/instagram/${encodeURIComponent(username)}`;
-        }
-
-        function loadImage(url){
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(url);
-                img.onerror = () => reject(new Error("Image failed"));
-                img.src = url + "?t=" + Date.now();
-            });
         }
 
         async function submitUserIdentifier() {
@@ -734,14 +718,11 @@
             appendUserMessage(rawVal);
             showTyping();
 
-            try {
-                const url = avatarUrl(username);
-                await loadImage(url); // Verifying profile via Endpoint API
-
+            setTimeout(() => {
                 hideTyping();
                 currentTargetUser = username;
 
-                // Show Persistent Profile Bar at the top
+                const url = `https://unavatar.io/instagram/${encodeURIComponent(username)}`;
                 barAvatarImg.src = url;
                 barUsernameTxt.innerText = "@" + username;
                 targetProfileBar.style.display = 'flex';
@@ -810,14 +791,7 @@
                 `;
                 document.getElementById(nextId).innerHTML += optionsHtml;
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-
-            } catch(e) {
-                hideTyping();
-                isProcessingStarted = false;
-                userInputField.disabled = false;
-                sendBtn.disabled = false;
-                showAlertNotification(`Could not load a public preview for "@${username}".`);
-            }
+            }, 800);
         }
 
         function checkUsernameAndSelect(nodeName, username) {

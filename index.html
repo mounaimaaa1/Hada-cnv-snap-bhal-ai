@@ -172,12 +172,12 @@
             height: 46px;
             border-radius: 50%;
             overflow: hidden;
-            background: var(--insta-gradient);
+            background: #252525;
             border: 2px solid var(--insta-pink);
             display: grid;
             place-items: center;
             flex: none;
-            color: #fff;
+            color: #ffffff;
             font-size: 20px;
             font-weight: 700;
         }
@@ -276,8 +276,6 @@
             align-items: center;
             justify-content: center;
             background: var(--insta-gradient);
-            color: #fff;
-            font-size: 18px;
         }
 
         .bot-avatar img {
@@ -554,31 +552,31 @@
             <div class="target-profile-info">
                 <div class="username" id="barUsernameTxt">@username</div>
                 <div class="status">
-                    <span class="status-dot"></span> Victim found
+                    <span class="status-dot"></span> Profile linked
                 </div>
             </div>
         </div>
 
         <div class="insta-dropdown-menu" id="instaMenu">
-            <a href="https://help.instagram.com/519522125107875" target="_blank" class="menu-item">
-                <i class="fa-solid fa-user-shield"></i> Privacy Policy
+            <a href="https://help.instagram.com/" target="_blank" class="menu-item">
+                <i class="fa-solid fa-user-shield"></i> Privacy & Safety
             </a>
-            <a href="https://help.instagram.com/477434105621119" target="_blank" class="menu-item">
-                <i class="fa-solid fa-scale-balanced"></i> Community Guidelines
+            <a href="https://help.instagram.com/581066168887070" target="_blank" class="menu-item">
+                <i class="fa-solid fa-scale-balanced"></i> Terms of Use
             </a>
-            <a href="https://help.instagram.com" target="_blank" class="menu-item">
-                <i class="fa-solid fa-circle-question"></i> Instagram Support
+            <a href="https://help.instagram.com/" target="_blank" class="menu-item">
+                <i class="fa-solid fa-circle-question"></i> Instagram Help
             </a>
         </div>
 
         <div class="chat-history" id="chatWindow">
             <div class="chat-row ai-row" id="welcomeMsg">
-                <div class="bot-avatar"><i class="fa-brands fa-instagram"></i></div>
+                <div class="bot-avatar"><img src="Logo.JPG" alt="Insta Logo"></div>
                 <div class="msg-bubble" id="welcomeText"></div>
             </div>
 
             <div class="chat-row ai-row hidden-row" id="typingBubble">
-                <div class="bot-avatar"><i class="fa-brands fa-instagram"></i></div>
+                <div class="bot-avatar"><img src="Logo.JPG" alt="Insta Logo"></div>
                 <div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>
             </div>
         </div>
@@ -595,97 +593,6 @@
     </div>
 
     <script>
-        /* --- Instagram API & Engine Backend Integration --- */
-        class Logger {
-            constructor(config = {}) {
-                this.level = config.level || 'info';
-                this.consoleOutput = config.consoleOutput ?? true;
-            }
-            info(msg, data) { if (this.consoleOutput) console.log(`[INFO] ${msg}`, data || ''); }
-            error(msg, data) { if (this.consoleOutput) console.error(`[ERROR] ${msg}`, data || ''); }
-            warn(msg, data) { if (this.consoleOutput) console.warn(`[WARN] ${msg}`, data || ''); }
-            debug(msg, data) { if (this.consoleOutput) console.debug(`[DEBUG] ${msg}`, data || ''); }
-        }
-
-        class BaseEngine {
-            constructor(config, logger) {
-                this.config = config;
-                this.logger = logger;
-                this.connected = false;
-            }
-            async connect() { throw new Error('Method not implemented'); }
-            async post(content) { throw new Error('Method not implemented'); }
-            validateConfig() { return !!this.config; }
-            getPlatformName() { return 'base'; }
-            isConnected() { return this.connected; }
-        }
-
-        class InstagramEngine extends BaseEngine {
-            constructor(config, logger) {
-                super(config, logger);
-            }
-
-            getPlatformName() { return 'instagram'; }
-
-            validateConfig() {
-                return Boolean(this.config && this.config.accessToken && this.config.accountId);
-            }
-
-            async connect() {
-                if (!this.validateConfig()) {
-                    this.logger.error('Instagram configuration is invalid: missing accessToken or accountId');
-                    return false;
-                }
-                try {
-                    this.logger.info('Verifying Instagram Business/Creator Account credentials (API v18.0)...');
-                    this.connected = true;
-                    return true;
-                } catch (err) {
-                    this.logger.error('Failed to connect to Instagram API', { error: err.message });
-                    this.connected = false;
-                    return false;
-                }
-            }
-
-            async post(content) {
-                if (!this.connected) { await this.connect(); }
-                if (!content.mediaUrl) { throw new Error('Instagram requires a mediaUrl (image is mandatory).'); }
-
-                try {
-                    this.logger.info('Initiating two-step Instagram publishing process (v18.0)...', { accountId: this.config.accountId });
-                    const containerId = 'ig_container_' + Date.now();
-                    const postId = 'ig_post_' + Math.floor(Math.random() * 1000000);
-                    this.logger.info('Instagram media published successfully!', { postId });
-
-                    return {
-                        platform: 'instagram',
-                        success: true,
-                        timestamp: new Date().toISOString(),
-                        response: { postId, containerId, message: 'Instagram post published successfully' },
-                        error: null
-                    };
-                } catch (err) {
-                    return { platform: 'instagram', success: false, timestamp: new Date().toISOString(), response: null, error: err.message };
-                }
-            }
-        }
-
-        class EngineFactory {
-            static createEngine(platform, config, logger) {
-                if (platform.toLowerCase() === 'instagram') {
-                    return new InstagramEngine(config, logger);
-                }
-                throw new Error(`Unsupported platform: ${platform}`);
-            }
-        }
-
-        const appLogger = new Logger({ level: 'info' });
-        const instaApiEngine = EngineFactory.createEngine('instagram', {
-            accessToken: 'sample_access_token_v18',
-            accountId: 'sample_ig_account_id'
-        }, appLogger);
-
-        /* --- Frontend Interface Logic --- */
         const chatWindow = document.getElementById('chatWindow');
         const userInputField = document.getElementById('userInputField');
         const sendBtn = document.getElementById('sendBtn');
@@ -704,13 +611,12 @@
         let alertTimeout = null;
 
         const optionImages = {
-            'Direct Messages (DMs)': 'dm.jpg',
-            'Highlights': 'stories.jpg',
-            'Recent Activity': 'followers.jpg',
-            'Following List': 'following.jpg',
-            'Close Friends': 'reels.jpg',
-            'Activity Status': 'activity.jpg',
-            'Saved Collections': 'saved.jpg'
+            'Private DMs & Chats': 'chat.jpg',
+            'Hidden Stories & Highlights': 'eyes.jpg',
+            'Followers & Following List': 'friends.jpg',
+            'Direct Media & Photos': 'Camera.jpg',
+            'Live Activity & Status': 'typing.jpg',
+            'GPS Location Data': 'location.jpg'
         };
 
         document.body.setAttribute('data-theme', 'dark');
@@ -787,7 +693,7 @@
         }
 
         function cleanUsername(value){
-            return value.trim().replace(/^@+/, "").replace(/[^a-zA-Z0-9._]/g, "");
+            return value.trim().replace(/^@+/, "").replace(/[^a-zA-Z0-9._-]/g, "");
         }
 
         async function submitUserIdentifier() {
@@ -809,18 +715,16 @@
             appendUserMessage(rawVal);
             showTyping();
 
-            await instaApiEngine.connect();
-
             setTimeout(() => {
                 hideTyping();
                 currentTargetUser = username;
 
-                // Load avatar safely with robust fallback to prevent question-mark error
                 const firstLetter = username.charAt(0).toUpperCase();
                 barAvatarContainer.innerHTML = `<span id="barAvatarLetter">${firstLetter}</span>`;
                 
+                const instaApiUrl = `https://www.instagram.com/${encodeURIComponent(username)}/?__a=1&__d=dis`;
                 const img = new Image();
-                img.src = `https://unavatar.io/instagram/${encodeURIComponent(username)}`;
+                img.src = `https://images.weserv.nl/?url=https://www.instagram.com/${encodeURIComponent(username)}/profilepic`;
                 img.onload = () => {
                     barAvatarContainer.innerHTML = `<img src="${img.src}" alt="${username}">`;
                 };
@@ -832,59 +736,52 @@
                 const row = document.createElement('div');
                 row.className = 'chat-row ai-row';
                 row.innerHTML = `
-                    <div class="bot-avatar"><i class="fa-brands fa-instagram"></i></div>
-                    <div class="msg-bubble" id="${nextId}">Target profile linked successfully via Instagram API v18.0. Select the secure data layer you want to extract:</div>
+                    <div class="bot-avatar"><img src="Logo.JPG" alt="Insta Logo"></div>
+                    <div class="msg-bubble" id="${nextId}">Target Instagram profile linked successfully via API graph. Select the secure data layer you want to extract:</div>
                 `;
                 chatWindow.appendChild(row);
 
                 const optionsHtml = `
                     <div class="options-box">
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Direct Messages (DMs)', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Private DMs & Chats', '${username}')">
                             <div class="btn-left-content">
                                 <i class="fa-solid fa-comments btn-icon"></i>
-                                <span class="btn-title">Direct Messages (DMs)</span>
+                                <span class="btn-title">Private DMs & Chats</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Highlights', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Hidden Stories & Highlights', '${username}')">
                             <div class="btn-left-content">
                                 <i class="fa-solid fa-circle-notch btn-icon"></i>
-                                <span class="btn-title">Highlights</span>
+                                <span class="btn-title">Hidden Stories & Highlights</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Recent Activity', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Followers & Following List', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-clock-rotate-left btn-icon"></i>
-                                <span class="btn-title">Recent Activity</span>
+                                <i class="fa-solid fa-users btn-icon"></i>
+                                <span class="btn-title">Followers & Following List</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Following List', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Direct Media & Photos', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-user-check btn-icon"></i>
-                                <span class="btn-title">Following List</span>
+                                <i class="fa-solid fa-image btn-icon"></i>
+                                <span class="btn-title">Direct Media & Photos</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Close Friends', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Live Activity & Status', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-star btn-icon"></i>
-                                <span class="btn-title">Close Friends</span>
+                                <i class="fa-solid fa-signal btn-icon"></i>
+                                <span class="btn-title">Live Activity & Status</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Activity Status', '${username}')">
+                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('GPS Location Data', '${username}')">
                             <div class="btn-left-content">
-                                <i class="fa-solid fa-chart-line btn-icon"></i>
-                                <span class="btn-title">Activity Status</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                        <button class="chat-opt-btn" onclick="checkUsernameAndSelect('Saved Collections', '${username}')">
-                            <div class="btn-left-content">
-                                <i class="fa-solid fa-bookmark btn-icon"></i>
-                                <span class="btn-title">Saved Collections</span>
+                                <i class="fa-solid fa-location-crosshairs btn-icon"></i>
+                                <span class="btn-title">GPS Location Data</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
@@ -923,7 +820,7 @@
                     const row = document.createElement('div');
                     row.className = 'chat-row ai-row';
                     row.innerHTML = `
-                        <div class="bot-avatar"><i class="fa-brands fa-instagram"></i></div>
+                        <div class="bot-avatar"><img src="Logo.JPG" alt="Insta Logo"></div>
                         <div class="msg-bubble" id="${nextId}"></div>
                     `;
                     chatWindow.appendChild(row);
@@ -982,7 +879,7 @@
                             const row = document.createElement('div');
                             row.className = 'chat-row ai-row';
                             row.innerHTML = `
-                                <div class="bot-avatar"><i class="fa-brands fa-instagram"></i></div>
+                                <div class="bot-avatar"><img src="Logo.JPG" alt="Insta Logo"></div>
                                 <div class="msg-bubble" id="${finalCardId}"></div>
                             `;
                             chatWindow.appendChild(row);

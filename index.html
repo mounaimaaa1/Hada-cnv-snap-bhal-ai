@@ -1,255 +1,39 @@
-<!-- Instagram Lookup Component -->
-<div class="insta-lookup-container">
-    <div class="insta-search-box">
-        <input type="text" id="instaUsernameInput" placeholder="Enter Instagram Username (e.g., cristiano)..." />
-        <button id="instaSearchBtn">
-            <i class="fas fa-search"></i> Search Profile
-        </button>
-    </div>
+<?php
 
-    <div id="instaLoader" class="insta-loader" style="display: none;">
-        <div class="spinner"></div>
-        <span>Searching Instagram...</span>
-    </div>
+namespace Instagram;
 
-    <div id="instaResultCard" class="insta-card" style="display: none;">
-        <div class="insta-header">
-            <img id="instaAvatar" src="" alt="Profile Picture" class="insta-avatar" />
-            <div class="insta-info">
-                <h3 id="instaFullname"></h3>
-                <p id="instaUsernameHandle" class="handle"></p>
-                <div class="insta-stats">
-                    <div><span id="instaPostsCount">0</span> posts</div>
-                    <div><span id="instaFollowersCount">0</span> followers</div>
-                    <div><span id="instaFollowingCount">0</span> following</div>
-                </div>
-            </div>
-        </div>
-        <p id="instaBio" class="insta-bio"></p>
-        <div class="insta-actions">
-            <a id="instaProfileLink" href="#" target="_blank" class="btn-instagram">Open on Instagram</a>
-        </div>
-        <div id="instaGrid" class="insta-grid">
-            <!-- Posts grid -->
-        </div>
-    </div>
-    
-    <div id="instaError" class="insta-error" style="display: none;">
-        <p>Profile not found or restricted. Try another username.</p>
-    </div>
-</div>
+class Scraper {
+    protected $username;
+    protected $timeout;
 
-<style>
-.insta-lookup-container {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
-    padding: 20px;
-    color: #f8fafc;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 500px;
-    margin: 20px auto;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-.insta-search-box {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-.insta-search-box input {
-    flex: 1;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 12px 15px;
-    color: #fff;
-    font-size: 14px;
-    outline: none;
-    transition: border 0.3s;
-}
-.insta-search-box input:focus {
-    border-color: #3b82f6;
-}
-.insta-search-box button {
-    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    padding: 0 20px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: opacity 0.3s;
-}
-.insta-search-box button:hover {
-    opacity: 0.9;
-}
-.insta-card {
-    background: #1e293b;
-    border-radius: 10px;
-    padding: 20px;
-    border: 1px solid #334155;
-}
-.insta-header {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 15px;
-}
-.insta-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fd1d1d;
-}
-.insta-info h3 {
-    margin: 0 0 5px 0;
-    font-size: 18px;
-}
-.handle {
-    color: #94a3b8;
-    margin: 0 0 10px 0;
-    font-size: 13px;
-}
-.insta-stats {
-    display: flex;
-    gap: 15px;
-    font-size: 13px;
-    color: #cbd5e1;
-}
-.insta-stats span {
-    font-weight: bold;
-    color: #fff;
-}
-.insta-bio {
-    font-size: 13px;
-    color: #cbd5e1;
-    margin-bottom: 15px;
-    white-space: pre-line;
-}
-.btn-instagram {
-    display: inline-block;
-    background: #3b82f6;
-    color: white;
-    text-decoration: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    text-align: center;
-    width: 100%;
-}
-.insta-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-.insta-grid img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #0f172a;
-}
-.insta-loader {
-    text-align: center;
-    padding: 20px;
-    color: #94a3b8;
-}
-.spinner {
-    width: 30px;
-    height: 30px;
-    border: 3px solid #334155;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 10px auto;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.insta-error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 13px;
-}
-</style>
+    public function __construct($username = null) {
+        $this->username = $username;
+        $this->timeout = 30;
+    }
 
-<script>
-document.getElementById('instaSearchBtn').addEventListener('click', async () => {
-    const username = document.getElementById('instaUsernameInput').value.trim();
-    if (!username) return;
-
-    const loader = document.getElementById('instaLoader');
-    const resultCard = document.getElementById('instaResultCard');
-    const errorBox = document.getElementById('instaError');
-
-    loader.style.display = 'block';
-    resultCard.style.display = 'none';
-    errorBox.style.display = 'none';
-
-    try {
-        // محاولة جلب البيانات عبر CORS Proxy عام
-        const url = `https://www.instagram.com/${username}/?__a=1&__d=dis`;
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error('Failed to fetch');
-        
-        const data = await response.json();
-        const user = data.graphql?.user || data;
-        
-        if (!user) throw new Error('User not found');
-
-        // تعبئة البيانات الحقيقية
-        document.getElementById('instaAvatar').src = user.profile_pic_url_hd || user.profile_pic_url || `https://ui-avatars.com/api/?name=${username}`;
-        document.getElementById('instaFullname').textContent = user.full_name || username;
-        document.getElementById('instaUsernameHandle').textContent = `@${username}`;
-        document.getElementById('instaPostsCount').textContent = user.edge_owner_to_timeline_media?.count || '0';
-        document.getElementById('instaFollowersCount').textContent = user.edge_followed_by?.count || '0';
-        document.getElementById('instaFollowingCount').textContent = user.edge_follow?.count || '0';
-        document.getElementById('instaBio').textContent = user.biography || '';
-        document.getElementById('instaProfileLink').href = `https://www.instagram.com/${username}/`;
-
-        const grid = document.getElementById('instaGrid');
-        grid.innerHTML = '';
-        const edges = user.edge_owner_to_timeline_media?.edges || [];
-        edges.slice(0, 6).forEach(edge => {
-            const img = document.createElement('img');
-            img.src = edge.node.display_url;
-            grid.appendChild(img);
-        });
-
-        loader.style.display = 'none';
-        resultCard.style.display = 'block';
-
-    } catch (err) {
-        loader.style.display = 'none';
-        
-        // Fallback في حالة حظر انستغرام للطلبات المباشرة (CORS / Anti-bot) باش الموقع ديما يبان خدام
-        document.getElementById('instaAvatar').src = `https://ui-avatars.com/api/?name=${username}&background=833ab4&color=fff&size=150`;
-        document.getElementById('instaFullname').textContent = username.charAt(0).toUpperCase() + username.slice(1);
-        document.getElementById('instaUsernameHandle').textContent = `@${username}`;
-        document.getElementById('instaPostsCount').textContent = '36';
-        document.getElementById('instaFollowersCount').textContent = '1,450';
-        document.getElementById('instaFollowingCount').textContent = '312';
-        document.getElementById('instaBio').textContent = `Official profile preview for @${username} \nGenerated via Web Tools Engine ⚡`;
-        document.getElementById('instaProfileLink').href = `https://www.instagram.com/${username}/`;
-
-        const grid = document.getElementById('instaGrid');
-        grid.innerHTML = '';
-        for(let i=0; i<6; i++) {
-            const img = document.createElement('img');
-            img.src = `https://picsum.photos/seed/${username}${i}/200`;
-            grid.appendChild(img);
+    public function getProfile($username = null) {
+        $targetUser = $username ? $username : $this->username;
+        if (!$targetUser) {
+            return null;
         }
 
-        resultCard.style.display = 'block';
+        $url = "https://www.instagram.com/{$targetUser}/?__a=1&__d=dis";
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200 || empty($response)) {
+            return false;
+        }
+
+        return json_decode($response, true);
     }
-});
-</script>
+}

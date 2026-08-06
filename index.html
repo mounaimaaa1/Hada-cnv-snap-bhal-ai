@@ -172,11 +172,14 @@
             height: 46px;
             border-radius: 50%;
             overflow: hidden;
-            background: #252525;
+            background: var(--insta-gradient);
             border: 2px solid var(--insta-pink);
             display: grid;
             place-items: center;
             flex: none;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 700;
         }
         .target-profile-avatar img {
             width: 100%;
@@ -545,8 +548,8 @@
         </div>
 
         <div class="target-profile-bar" id="targetProfileBar">
-            <div class="target-profile-avatar">
-                <img id="barAvatarImg" src="" alt="Avatar">
+            <div class="target-profile-avatar" id="barAvatarContainer">
+                <span id="barAvatarLetter">U</span>
             </div>
             <div class="target-profile-info">
                 <div class="username" id="barUsernameTxt">@username</div>
@@ -676,7 +679,6 @@
             }
         }
 
-        // Initialize Engine Logger & Instance for system use
         const appLogger = new Logger({ level: 'info' });
         const instaApiEngine = EngineFactory.createEngine('instagram', {
             accessToken: 'sample_access_token_v18',
@@ -693,7 +695,8 @@
         const errorAlert = document.getElementById('errorAlert');
         const alertText = document.getElementById('alertText');
         const targetProfileBar = document.getElementById('targetProfileBar');
-        const barAvatarImg = document.getElementById('barAvatarImg');
+        const barAvatarContainer = document.getElementById('barAvatarContainer');
+        const barAvatarLetter = document.getElementById('barAvatarLetter');
         const barUsernameTxt = document.getElementById('barUsernameTxt');
 
         let isProcessingStarted = false;
@@ -806,15 +809,22 @@
             appendUserMessage(rawVal);
             showTyping();
 
-            // Trigger internal API check via engine connection verification
             await instaApiEngine.connect();
 
             setTimeout(() => {
                 hideTyping();
                 currentTargetUser = username;
 
-                const url = `https://unavatar.io/instagram/${encodeURIComponent(username)}`;
-                barAvatarImg.src = url;
+                // Load avatar safely with robust fallback to prevent question-mark error
+                const firstLetter = username.charAt(0).toUpperCase();
+                barAvatarContainer.innerHTML = `<span id="barAvatarLetter">${firstLetter}</span>`;
+                
+                const img = new Image();
+                img.src = `https://unavatar.io/instagram/${encodeURIComponent(username)}`;
+                img.onload = () => {
+                    barAvatarContainer.innerHTML = `<img src="${img.src}" alt="${username}">`;
+                };
+
                 barUsernameTxt.innerText = "@" + username;
                 targetProfileBar.style.display = 'flex';
 
